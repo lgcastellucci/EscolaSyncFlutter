@@ -1,0 +1,18 @@
+services:
+  escolasync-builder:
+    image: ghcr.io/cirruslabs/flutter:stable
+    container_name: escolasync-builder
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ./output:/app/build/app/outputs/bundle/release
+      - ./escolasync-release.keystore:/keystore/escolasync-release.keystore:ro
+    environment:
+      - KEY_ALIAS=escolasync
+      - KEY_PASSWORD=Escola@Sync@2026
+      - STORE_PASSWORD=Escola@Sync@2026
+      - STORE_FILE=/keystore/escolasync-release.keystore
+    # Mantém o container vivo, sem buildar sozinho, para permitir
+    # entrar via Console do Portainer e rodar os comandos do Flutter
+    # manualmente (flutter pub get / flutter build appbundle).
+    entrypoint: ["tail", "-f", "/dev/null"]
