@@ -126,10 +126,25 @@ para subir como atualização na Play Console (versão atual do projeto:
   `AndroidManifest.xml` já referenciava desde o início (`LaunchTheme`,
   `NormalTheme`, `@mipmap/ic_launcher`), causando erro
   `AAPT: error: resource ... not found`. Agora existem `values/styles.xml`,
-  `drawable/launch_background.xml` (cor de fundo `#0F172A`, igual ao
+  `drawable/launch_background.xml` (cor de fundo `#1565C0`, igual ao
   app) e os ícones em `mipmap-*/ic_launcher.png` (ícone simples, pasta
-  azul `#1E40AF` — troque pelo ícone definitivo quando tiver um, por
-  exemplo com o pacote `flutter_launcher_icons`).
+  azul — troque pelo ícone definitivo quando tiver um, por exemplo com
+  o pacote `flutter_launcher_icons`).
+- **Ícone recortado (corrigido):** o `ic_launcher_foreground.png` (usado
+  pelo ícone adaptativo, `mipmap-anydpi-v26/ic_launcher.xml`) estava
+  desenhado grande demais, ultrapassando a "zona segura" (~66% do
+  canvas) que o Android garante visível em qualquer formato de máscara
+  de launcher (círculo, squircle, etc.) — por isso a pasta aparecia
+  cortada em alguns lançadores. Foi regenerado com margem adequada
+  (conteúdo a ~50% do canvas, bem dentro da zona segura).
+- **Layout compactado quando conectado:** o cabeçalho fica mais baixo
+  (`_HeaderCard(compact: true)`), o card de conta perdeu o badge
+  redundante "✓ Conectado" (o círculo verde + e-mail já bastam) e o
+  botão "Sair da conta" virou um link discreto na mesma linha do
+  e-mail, e o card do álbum juntou nome + contagem de fotos numa linha
+  só. O objetivo era caber o botão "Enviar Agora" na tela sem rolar
+  logo após autenticar — testado com mockup HTML antes de aplicar no
+  Flutter.
 - **Login em conta separada do celular:** o app usa `google_sign_in`
   (SDK nativo do Android). Ele mostra o seletor de contas já cadastradas
   no aparelho e, pra uma conta nova, aciona o fluxo "Adicionar conta ao

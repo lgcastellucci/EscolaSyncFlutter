@@ -1,7 +1,7 @@
 name: escolasync
 description: Move fotos do álbum "Escola" para o Google Drive e deleta localmente após upload.
 publish_to: 'none'
-version: 1.0.21+21
+version: 1.0.11+11
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

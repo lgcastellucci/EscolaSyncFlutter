@@ -238,10 +238,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text('EscolaSync')),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           children: [
-            _HeaderCard(),
-            const SizedBox(height: 11),
+            _HeaderCard(compact: _authenticated),
+            const SizedBox(height: 8),
             _AccountCard(
               authenticated: _authenticated,
               email: _authService.userEmail,
@@ -249,22 +249,22 @@ class _HomePageState extends State<HomePage> {
               onSignIn: _authenticate,
               onSignOut: _signOut,
             ),
-            const SizedBox(height: 11),
+            const SizedBox(height: 8),
             _AlbumCard(authenticated: _authenticated, albumCount: _albumCount),
-            const SizedBox(height: 11),
+            const SizedBox(height: 8),
             if (_runState == _RunState.running) ...[
               _ProgressCard(
                 total: _total,
                 done: _done,
                 currentFileName: _currentFileName,
               ),
-              const SizedBox(height: 11),
+              const SizedBox(height: 8),
               const _StatusPill(
                 icon: '📡',
                 text: 'Conectado ao Drive — não feche o app',
                 kind: _PillKind.info,
               ),
-              const SizedBox(height: 11),
+              const SizedBox(height: 8),
             ],
             if (_runState == _RunState.done) ...[
               _ResultCard(
@@ -272,16 +272,16 @@ class _HomePageState extends State<HomePage> {
                 deleted: _deleted,
                 failed: _failed,
               ),
-              const SizedBox(height: 11),
+              const SizedBox(height: 8),
             ],
             _SendButton(
               state: _runState,
               enabled: _authenticated,
               onPressed: _sendNow,
             ),
-            const SizedBox(height: 11),
+            const SizedBox(height: 8),
             const _WarningBox(),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
             _TechnicalLogSection(
               expanded: _showTechnicalLog,
               onToggle: () =>
@@ -290,7 +290,7 @@ class _HomePageState extends State<HomePage> {
               scrollController: _logScroll,
               timeFmt: _timeFmt,
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
             if (_versionLabel.isNotEmpty)
               Center(
                 child: Text(
@@ -316,11 +316,17 @@ class _HomePageState extends State<HomePage> {
 // ─────────────────────────────────────────────────────────────────────
 
 class _HeaderCard extends StatelessWidget {
+  final bool compact;
+  const _HeaderCard({this.compact = false});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: compact ? 12 : 18,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
@@ -336,19 +342,32 @@ class _HeaderCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          const Text('📚', style: TextStyle(fontSize: 28)),
-          const SizedBox(height: 4),
-          Text('EscolaSync',
-              style: GoogleFonts.dmSans(
-                  fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
-          const SizedBox(height: 2),
-          Text('Mova fotos do álbum para o Google Drive',
-              style: GoogleFonts.dmSans(
-                  fontSize: 11.5, color: Colors.white.withValues(alpha: 0.75))),
-        ],
-      ),
+      child: compact
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('📚', style: TextStyle(fontSize: 20)),
+                const SizedBox(width: 8),
+                Text('EscolaSync',
+                    style: GoogleFonts.dmSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+              ],
+            )
+          : Column(
+              children: [
+                const Text('📚', style: TextStyle(fontSize: 28)),
+                const SizedBox(height: 4),
+                Text('EscolaSync',
+                    style: GoogleFonts.dmSans(
+                        fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
+                const SizedBox(height: 2),
+                Text('Mova fotos do álbum para o Google Drive',
+                    style: GoogleFonts.dmSans(
+                        fontSize: 11.5, color: Colors.white.withValues(alpha: 0.75))),
+              ],
+            ),
     );
   }
 }
@@ -360,7 +379,7 @@ class _CardLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         text.toUpperCase(),
         style: GoogleFonts.dmSans(
@@ -383,7 +402,7 @@ class _CardShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
@@ -426,80 +445,61 @@ class _AccountCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: authenticated ? AppColors.greenBg : AppColors.blue50,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
                 child: Text(authenticated ? '🟢' : '👤',
-                    style: const TextStyle(fontSize: 16)),
+                    style: const TextStyle(fontSize: 14)),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      authenticated
-                          ? (email ?? 'Conta conectada')
-                          : 'Nenhuma conta conectada',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: authenticated ? AppColors.gray900 : AppColors.gray400,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (authenticated) ...[
-                      const SizedBox(height: 2),
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.greenBg,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text('✓ Conectado',
-                            style: GoogleFonts.dmSans(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.green)),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  authenticated
+                      ? (email ?? 'Conta conectada')
+                      : 'Nenhuma conta conectada',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: authenticated ? AppColors.gray900 : AppColors.gray400,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (authenticated)
+                TextButton(
+                  onPressed: busy ? null : onSignOut,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.red,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('Sair', style: TextStyle(fontSize: 12.5)),
+                ),
             ],
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: authenticated
-                ? OutlinedButton(
-                    onPressed: busy ? null : onSignOut,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.red,
-                      side: const BorderSide(color: AppColors.red, width: 1.5),
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text('🚪  Sair da conta'),
-                  )
-                : ElevatedButton(
-                    onPressed: busy ? null : onSignIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.blue700,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text('🔐  Entrar com Google'),
-                  ),
-          ),
+          if (!authenticated) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: busy ? null : onSignIn,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('🔐  Entrar com Google'),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -519,7 +519,7 @@ class _AlbumCard extends StatelessWidget {
         children: [
           const _CardLabel('Álbum de origem'),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
             decoration: BoxDecoration(
               color: AppColors.gray100,
               borderRadius: BorderRadius.circular(10),
@@ -532,32 +532,32 @@ class _AlbumCard extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: AppColors.gray900)),
+                Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: authenticated
+                            ? AppColors.blue500
+                            : AppColors.gray400,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      authenticated ? '$albumCount foto(s)' : 'Faça login',
+                      style: GoogleFonts.dmSans(
+                          fontSize: 11.5, color: AppColors.gray400),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: authenticated ? AppColors.blue500 : AppColors.gray400,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                authenticated
-                    ? '$albumCount foto(s) no álbum'
-                    : 'Faça login para ver as fotos',
-                style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.gray400),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.blue50,
               border: Border.all(color: AppColors.blue200),
@@ -565,20 +565,22 @@ class _AlbumCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Text('📁', style: TextStyle(fontSize: 20)),
+                const Text('📁', style: TextStyle(fontSize: 18)),
                 const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('DESTINO NO DRIVE',
-                        style: GoogleFonts.dmSans(
-                            fontSize: 10, color: AppColors.gray400)),
-                    Text('Google Drive → pasta "Escola"',
-                        style: GoogleFonts.dmSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.blue700)),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('DESTINO NO DRIVE',
+                          style: GoogleFonts.dmSans(
+                              fontSize: 9.5, color: AppColors.gray400)),
+                      Text('Google Drive → pasta "Escola"',
+                          style: GoogleFonts.dmSans(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.blue700)),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -801,7 +803,7 @@ class _SendButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             onTap: active ? onPressed : null,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Center(
                 child: Text(
                   running ? '📤  Enviando…' : '📤  Enviar Agora',
